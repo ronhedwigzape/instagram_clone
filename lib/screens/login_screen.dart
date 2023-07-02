@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram_clone/resources/auth_methods.dart';
+import 'package:instagram_clone/screens/home_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
@@ -13,12 +15,41 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+  }
+
+  void loginUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String res = await AuthMethods().loginUser(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim()
+    );
+
+    if (res != 'Success') {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(res),
+        duration: const Duration(seconds: 2),
+      ));
+    } else {
+      Navigator.of(context)
+      .pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen()
+        )
+      );
+    }
   }
 
   @override
@@ -60,6 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 24.0),
             // button login
             InkWell(
+              onTap: loginUser,
               child: Container(
                 width: double.infinity,
                 alignment: Alignment.center,
@@ -70,7 +102,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   color: blueColor,
                 ),
-                child: const Text('Log in')),
+                child: _isLoading 
+                ? const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                  ) 
+                ): const Text('Log in')
+              ),
             ),
             const SizedBox(height: 12.0),
             Flexible(
