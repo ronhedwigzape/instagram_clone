@@ -20,6 +20,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   Uint8List? _image;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -35,6 +36,32 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _image = image;
     });
+  }
+
+  void signUpUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String res = await AuthMethods().signUpUser(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        username: _usernameController.text.trim(),
+        bio: _bioController.text.trim(),
+        file: _image);
+
+    if (res != 'Success') {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(res),
+        duration: const Duration(seconds: 2),
+      ));
+    } else {
+      // navigate to home screen
+      // Navigator.pushReplacementNamed(context, '/home');
+    }
   }
 
   @override
@@ -62,20 +89,18 @@ class _SignupScreenState extends State<SignupScreen> {
             // circular widget to accept and show our selected file
             Stack(
               children: [
-                _image != null ?
-                CircleAvatar(
-                  radius: 64,
-                  backgroundImage: MemoryImage(_image!)
-                ) :
-                const CircleAvatar(
-                  radius: 64,
-                  backgroundImage: NetworkImage(
-                      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png'),
-                ),
-                Positioned(
-                  bottom: -10,
-                  left: 80,
-                  child: IconButton(
+                _image != null
+                ? CircleAvatar(
+                    radius: 64, backgroundImage: MemoryImage(_image!))
+                : const CircleAvatar(
+                    radius: 64,
+                    backgroundImage: NetworkImage(
+                        'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png'),
+                  ),
+              Positioned(
+                bottom: -10,
+                left: 80,
+                child: IconButton(
                     onPressed: selectImage,
                     icon: const Icon(
                       Icons.add_a_photo,
@@ -116,29 +141,24 @@ class _SignupScreenState extends State<SignupScreen> {
             const SizedBox(height: 24.0),
             // button login
             InkWell(
-              onTap: () async {
-                String res = await AuthMethods().signUpUser(
-                  email: _emailController.text,
-                  password: _passwordController.text,
-                  username: _usernameController.text,
-                  bio: _bioController.text,
-                  file: _image!
-                );
-                if (kDebugMode) {
-                  print(res);
-                }
-              },
+              onTap: signUpUser,
               child: Container(
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  decoration: const ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    ),
-                    color: blueColor,
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                decoration: const ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   ),
-                  child: const Text('Sign up')),
+                  color: blueColor,
+                ),
+                child: _isLoading 
+                ? const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                  ) 
+                ): const Text('Sign up')
+              )
             ),
             const SizedBox(height: 12.0),
             Flexible(
