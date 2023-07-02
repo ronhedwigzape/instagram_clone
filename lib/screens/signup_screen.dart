@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_clone/resources/auth_methods.dart';
+import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
+import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
+import 'package:instagram_clone/responsive/web_screen_layout.dart';
+import 'package:instagram_clone/screens/login_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
@@ -38,30 +42,56 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  void signUpUser() async {
+  Future<void> signUpUser() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  String res = await AuthMethods().signUpUser(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+      username: _usernameController.text.trim(),
+      bio: _bioController.text.trim(),
+      file: _image);
+
     setState(() {
-      _isLoading = true;
+      _isLoading = false;
     });
 
-    String res = await AuthMethods().signUpUser(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        username: _usernameController.text.trim(),
-        bio: _bioController.text.trim(),
-        file: _image);
-
-    if (res != 'Success') {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(res),
-        duration: const Duration(seconds: 2),
-      ));
+    if (res == 'Success') {
+      onSignupSuccess();
     } else {
-      // navigate to home screen
-      // Navigator.pushReplacementNamed(context, '/home');
+      onSignupFailure(res);
     }
+  }
+
+  void onSignupSuccess() {
+    Navigator.of(context)
+    .push(MaterialPageRoute(
+      builder: (context) => 
+        const ResponsiveLayout(
+          webScreenLayout: WebScreenLayout(),
+          mobileScreenLayout: MobileScreenLayout()
+        )
+      )
+    );
+  }
+
+  void onSignupFailure(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
+
+  void navigateToLogin() {
+  Navigator.of(context)
+  .push(
+    MaterialPageRoute(
+      builder: (context) => const LoginScreen()
+      )
+    );
   }
 
   @override
@@ -175,13 +205,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: const Text('Don\'t have an account?'),
                 ),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: navigateToLogin,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
                     ),
                     child: const Text(
-                      ' Sign up.',
+                      'Log in',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),

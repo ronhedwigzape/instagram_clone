@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_clone/resources/auth_methods.dart';
-import 'package:instagram_clone/screens/home_screen.dart';
+import 'package:instagram_clone/responsive/mobile_screen_layout.dart';
+import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
+import 'package:instagram_clone/responsive/web_screen_layout.dart';
+import 'package:instagram_clone/screens/signup_screen.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
@@ -24,32 +27,51 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
   }
 
-  void loginUser() async {
+  Future<void> loginUser() async {
     setState(() {
       _isLoading = true;
     });
 
     String res = await AuthMethods().loginUser(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim()
-    );
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim());
 
-    if (res != 'Success') {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(res),
-        duration: const Duration(seconds: 2),
-      ));
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (res == 'Success') {
+      onLoginSuccess();
     } else {
-      Navigator.of(context)
-      .pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen()
-        )
-      );
+      onLoginFailure(res);
     }
+  }
+
+  void onLoginSuccess() {
+    Navigator.of(context)
+    .push(MaterialPageRoute(
+      builder: (context) => 
+        const ResponsiveLayout(
+          webScreenLayout: WebScreenLayout(),
+          mobileScreenLayout: MobileScreenLayout()
+        )
+      )
+    );
+  }
+
+  void onLoginFailure(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
+  void navigateToSignup() {
+    Navigator.of(context)
+    .push(MaterialPageRoute(
+      builder: (context) => const SignupScreen()
+      )
+    );
   }
 
   @override
@@ -93,22 +115,22 @@ class _LoginScreenState extends State<LoginScreen> {
             InkWell(
               onTap: loginUser,
               child: Container(
-                width: double.infinity,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                decoration: const ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  decoration: const ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    ),
+                    color: blueColor,
                   ),
-                  color: blueColor,
-                ),
-                child: _isLoading 
-                ? const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                  ) 
-                ): const Text('Log in')
-              ),
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(primaryColor),
+                        ))
+                      : const Text('Log in')),
             ),
             const SizedBox(height: 12.0),
             Flexible(
@@ -125,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text('Don\'t have an account?'),
                 ),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: navigateToSignup,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
