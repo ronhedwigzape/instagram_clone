@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
@@ -37,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
-              flex: 2,
+              flex: 1,
               child: Container(),
             ),
             // svg image
@@ -53,22 +54,21 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 const CircleAvatar(
                   radius: 64,
-                  backgroundImage: NetworkImage('https://images.unsplash.com/photo-1688166815223-594655d6157b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80'),
+                  backgroundImage: NetworkImage(
+                      'https://images.unsplash.com/photo-1534083220759-4c3c00112ea0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80'),
                 ),
                 Positioned(
-                  bottom: -10,
-                  left: 80,
-                  child: IconButton(
-                    onPressed: () {
-                      if (kDebugMode) {
-                        print(_emailController.text);
-                      }
-                    }, 
-                    icon: const Icon(
-                      Icons.add_a_photo,
-                    )
-                  )  
-                )
+                    bottom: -10,
+                    left: 80,
+                    child: IconButton(
+                        onPressed: () {
+                          if (kDebugMode) {
+                            print(_emailController.text);
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.add_a_photo,
+                        )))
               ],
             ),
             const SizedBox(height: 24.0),
@@ -103,17 +103,28 @@ class _SignupScreenState extends State<SignupScreen> {
             const SizedBox(height: 24.0),
             // button login
             InkWell(
+              onTap: () async {
+                String res = await AuthMethods().signUpUser(
+                  email: _emailController.text,
+                  password: _passwordController.text,
+                  username: _usernameController.text,
+                  bio: _bioController.text
+                );
+                if (kDebugMode) {
+                  print(res);
+                }
+              },
               child: Container(
-                width: double.infinity,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                decoration: const ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  decoration: const ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    ),
+                    color: blueColor,
                   ),
-                  color: blueColor,
-                ),
-                child: const Text('Sign up')),
+                  child: const Text('Sign up')),
             ),
             const SizedBox(height: 12.0),
             Flexible(
