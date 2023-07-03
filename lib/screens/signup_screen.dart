@@ -54,10 +54,6 @@ class _SignupScreenState extends State<SignupScreen> {
       bio: _bioController.text.trim(),
       file: _image);
 
-    setState(() {
-      _isLoading = false;
-    });
-
     if (res == 'Success') {
       onSignupSuccess();
     } else {
@@ -66,6 +62,9 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void onSignupSuccess() {
+    setState(() {
+      _isLoading = false;
+    });
     Navigator.of(context)
     .push(MaterialPageRoute(
       builder: (context) => 
@@ -78,6 +77,9 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void onSignupFailure(String message) {
+    setState(() {
+      _isLoading = false;
+    });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
       duration: const Duration(seconds: 2),

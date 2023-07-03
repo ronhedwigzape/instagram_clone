@@ -36,10 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim());
 
-    setState(() {
-      _isLoading = false;
-    });
-
     if (res == 'Success') {
       onLoginSuccess();
     } else {
@@ -48,6 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void onLoginSuccess() {
+    setState(() {
+      _isLoading = false;
+    });
     Navigator.of(context)
     .push(MaterialPageRoute(
       builder: (context) => 
@@ -60,6 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void onLoginFailure(String message) {
+    setState(() {
+      _isLoading = false;
+    });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
       duration: const Duration(seconds: 2),
