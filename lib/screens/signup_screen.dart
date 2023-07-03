@@ -204,7 +204,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: const EdgeInsets.symmetric(
                     vertical: 8,
                   ),
-                  child: const Text('Don\'t have an account?'),
+                  child: const Text('Already have an account?'),
                 ),
                 GestureDetector(
                   onTap: navigateToLogin,
@@ -213,7 +213,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       vertical: 8,
                     ),
                     child: const Text(
-                      'Log in',
+                      ' Login here',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
