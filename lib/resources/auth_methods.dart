@@ -8,9 +8,18 @@ class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<model.User> getUserDetails() async {
+    User currentUser = _auth.currentUser!;
+
+    DocumentSnapshot snap =
+        await _firestore.collection('users').doc(currentUser.uid).get();
+
+    return model.User.fromSnap(snap);
+  }
+
   //sign up user
-  Future<String> signUpUser({
-      required String email,
+  Future<String> signUpUser(
+      {required String email,
       required String password,
       required String username,
       required String bio,
@@ -33,7 +42,8 @@ class AuthMethods {
 
         String photoUrl = '';
         if (file != null) {
-          photoUrl = await StorageMethods().uploadImageToStorage('profileImage', file, false);
+          photoUrl = await StorageMethods()
+              .uploadImageToStorage('profileImage', file, false);
         }
 
         model.User user = model.User(
@@ -43,11 +53,14 @@ class AuthMethods {
           username: username,
           bio: bio,
           followers: [],
-          following: [], 
+          following: [],
         );
 
         // add user to our database
-        await _firestore.collection('users').doc(credential.user!.uid).set(user.toJson()); 
+        await _firestore
+            .collection('users')
+            .doc(credential.user!.uid)
+            .set(user.toJson());
 
         res = "Success";
       }
@@ -64,7 +77,6 @@ class AuthMethods {
     }
     return res;
   }
-
 
   Future<String> loginUser(
       {required String email, required String password}) async {
