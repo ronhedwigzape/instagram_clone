@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/models/user.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
@@ -18,6 +19,34 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   bool isLikeAnimating = false;
+  int commentLength = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getComments();
+  }
+
+  void getComments() async {
+    try {
+      QuerySnapshot snap = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.snap['postId'])
+          .collection('comments')
+          .get();
+
+      commentLength = snap.docs.length;
+    } catch (e) {
+      if (mounted) {
+        showSnackBar(e.toString(), context);
+      }
+    }
+  }
+
+  void showSnackBar(String message, BuildContext context) {
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,13 +173,10 @@ class _PostCardState extends State<PostCard> {
             ),
             IconButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
+                  Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => CommentsScreen(
-                        snap: widget.snap,
-                      )
-                    )
-                  );
+                            snap: widget.snap,
+                          )));
                 },
                 icon: const Icon(
                   Icons.comment_outlined,
@@ -212,11 +238,11 @@ class _PostCardState extends State<PostCard> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Text(
-                      'View all 123 comments',
+                      'View all $commentLength comments',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: secondaryColor,
-                            fontSize: 16,
-                          ),
+                        color: secondaryColor,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
