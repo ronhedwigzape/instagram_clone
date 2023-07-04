@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:instagram_clone/models/post.dart';
 import 'package:instagram_clone/resources/storage_methods.dart';
 import 'package:uuid/uuid.dart';
@@ -43,15 +44,45 @@ class FireStoreMethods {
 
   Future<void> likePost(String postId, String uid, List likes) async {
     try {
-      if(likes.contains(uid)) {
+      if (likes.contains(uid)) {
         await _firestore.collection('posts').doc(postId).update({
-          'likes': FieldValue.arrayRemove([uid]), 
+          'likes': FieldValue.arrayRemove([uid]),
         });
       } else {
         await _firestore.collection('posts').doc(postId).update({
-          'likes': FieldValue.arrayUnion([uid]), 
+          'likes': FieldValue.arrayUnion([uid]),
         });
       }
     } catch (e) {}
+  }
+
+  Future<void> postComment(String postId, String text, String uid,
+      String name, String profileImage) async {
+    try {
+      if (text.isNotEmpty) {
+        String commentId = const Uuid().v1();
+        _firestore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          'profileImage': profileImage,
+          'name': name,
+          'uid': uid,
+          'text': text,
+          'commentId': commentId,
+          'datePublished': DateTime.now(),
+        });
+      } else {
+        if (kDebugMode) {
+          print('Text is empty');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
   }
 }

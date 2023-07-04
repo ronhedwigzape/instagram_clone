@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class PostCard extends StatefulWidget {
-  const PostCard({Key? key, this.snap}) : super(key: key);
+  const PostCard({Key? key, required this.snap}) : super(key: key);
   final snap;
 
   @override
@@ -144,8 +144,11 @@ class _PostCardState extends State<PostCard> {
             ),
             IconButton(
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => CommentsScreen()
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => CommentsScreen(
+                        snap: widget.snap,
+                      )
                     )
                   );
                 },
