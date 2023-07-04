@@ -94,7 +94,11 @@ class _PostCardState extends State<PostCard> {
                                 'Delete',
                               ]
                                   .map((e) => InkWell(
-                                        onTap: () {},
+                                        onTap: () async {
+                                          FireStoreMethods().deletePost(
+                                              widget.snap['postId']);
+                                          Navigator.of(context).pop();
+                                        },
                                         child: Container(
                                             padding: const EdgeInsets.symmetric(
                                                 vertical: 12, horizontal: 16),
@@ -240,9 +244,9 @@ class _PostCardState extends State<PostCard> {
                     child: Text(
                       'View all $commentLength comments',
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: secondaryColor,
-                        fontSize: 16,
-                      ),
+                            color: secondaryColor,
+                            fontSize: 16,
+                          ),
                     ),
                   ),
                 ),
