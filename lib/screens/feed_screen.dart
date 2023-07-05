@@ -39,9 +39,15 @@ class FeedScreen extends StatelessWidget {
 
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) => PostCard(
-              snap: snapshot.data!.docs[index].data(),
-            ),
+            itemBuilder: (context, index) {
+              var snap = snapshot.data!.docs[index].data();
+              if (snap.isNotEmpty) {
+                return PostCard(snap: snap);
+              } else {
+                // Handle the case where snap is empty.
+                return const SizedBox.shrink();  // Replace this with your desired behavior.
+              }
+            },
           );
         },
       ),
